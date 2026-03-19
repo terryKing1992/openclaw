@@ -197,6 +197,15 @@ Notes:
 - If both `gateway.auth.token` and `gateway.auth.password` are configured and `gateway.auth.mode` is unset, install is blocked until mode is set explicitly.
 - Lifecycle commands accept `--json` for scripting.
 
+### Platform-specific notes
+
+**OpenHarmony (HarmonyOS PC):**
+
+- Service management uses PID-based process tracking (no system service manager like launchd/systemd).
+- Logs are written to `~/.openclaw/logs/gateway-<port>.log` and `~/.openclaw/logs/gateway-<port>.err`.
+- Multiple gateway instances are supported via port-based config files (`~/.openclaw/gateway-<port>.env`).
+- Auto-start on boot is not available in Phase 1 (requires native BackgroundTaskManager integration in a future release).
+
 ## Discover gateways (Bonjour)
 
 `gateway discover` scans for Gateway beacons (`_openclaw-gw._tcp`).

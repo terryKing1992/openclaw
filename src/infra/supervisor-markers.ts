@@ -2,17 +2,19 @@ const SUPERVISOR_HINTS = {
   launchd: ["LAUNCH_JOB_LABEL", "LAUNCH_JOB_NAME", "XPC_SERVICE_NAME", "OPENCLAW_LAUNCHD_LABEL"],
   systemd: ["OPENCLAW_SYSTEMD_UNIT", "INVOCATION_ID", "SYSTEMD_EXEC_PID", "JOURNAL_STREAM"],
   schtasks: ["OPENCLAW_WINDOWS_TASK_NAME"],
+  ohos: ["OPENCLAW_OHOS_SERVICE_NAME"],
 } as const;
 
 export const SUPERVISOR_HINT_ENV_VARS = [
   ...SUPERVISOR_HINTS.launchd,
   ...SUPERVISOR_HINTS.systemd,
   ...SUPERVISOR_HINTS.schtasks,
+  ...SUPERVISOR_HINTS.ohos,
   "OPENCLAW_SERVICE_MARKER",
   "OPENCLAW_SERVICE_KIND",
 ] as const;
 
-export type RespawnSupervisor = "launchd" | "systemd" | "schtasks";
+export type RespawnSupervisor = "launchd" | "systemd" | "schtasks" | "ohos";
 
 function hasAnyHint(env: NodeJS.ProcessEnv, keys: readonly string[]): boolean {
   return keys.some((key) => {
@@ -30,6 +32,9 @@ export function detectRespawnSupervisor(
   }
   if (platform === "linux") {
     return hasAnyHint(env, SUPERVISOR_HINTS.systemd) ? "systemd" : null;
+  }
+  if (platform === "openharmony") {
+    return hasAnyHint(env, SUPERVISOR_HINTS.ohos) ? "ohos" : null;
   }
   if (platform === "win32") {
     if (hasAnyHint(env, SUPERVISOR_HINTS.schtasks)) {

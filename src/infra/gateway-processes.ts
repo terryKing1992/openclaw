@@ -111,7 +111,7 @@ function readWindowsListeningPidsOnPortSync(port: number): number[] {
 }
 
 export function readGatewayProcessArgsSync(pid: number): string[] | null {
-  if (process.platform === "linux") {
+  if (process.platform === "linux" || process.platform === "openharmony") {
     try {
       return parseProcCmdline(fsSync.readFileSync(`/proc/${pid}/cmdline`, "utf8"));
     } catch {

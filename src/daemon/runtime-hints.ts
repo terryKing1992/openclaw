@@ -1,4 +1,5 @@
 import { resolveGatewayLogPaths } from "./launchd.js";
+import { resolveOhosLogPaths } from "./ohos-service.js";
 import { toPosixPath } from "./output.js";
 
 function toDarwinDisplayPath(value: string): string {
@@ -23,6 +24,14 @@ export function buildPlatformRuntimeLogHints(params: {
   if (platform === "linux") {
     return [`Logs: journalctl --user -u ${params.systemdServiceName}.service -n 200 --no-pager`];
   }
+  if (platform === "openharmony") {
+    const port = env.OPENCLAW_GATEWAY_PORT ? Number.parseInt(env.OPENCLAW_GATEWAY_PORT, 10) : 18789;
+    const logs = resolveOhosLogPaths(env, Number.isFinite(port) ? port : 18789);
+    return [
+      `Gateway stdout: ${toPosixPath(logs.stdoutPath)}`,
+      `Gateway stderr: ${toPosixPath(logs.stderrPath)}`,
+    ];
+  }
   if (platform === "win32") {
     return [`Logs: schtasks /Query /TN "${params.windowsTaskName}" /V /FO LIST`];
   }
@@ -44,6 +53,8 @@ export function buildPlatformServiceStartHints(params: {
       return [...base, `launchctl bootstrap gui/$UID ${params.launchAgentPlistPath}`];
     case "linux":
       return [...base, `systemctl --user start ${params.systemdServiceName}.service`];
+    case "openharmony":
+      return base;
     case "win32":
       return [...base, `schtasks /Run /TN "${params.windowsTaskName}"`];
     default:

@@ -8,6 +8,7 @@ describe("SUPERVISOR_HINT_ENV_VARS", () => {
         "LAUNCH_JOB_LABEL",
         "INVOCATION_ID",
         "OPENCLAW_WINDOWS_TASK_NAME",
+        "OPENCLAW_OHOS_SERVICE_NAME",
         "OPENCLAW_SERVICE_MARKER",
         "OPENCLAW_SERVICE_KIND",
       ]),
@@ -63,5 +64,13 @@ describe("detectRespawnSupervisor", () => {
     expect(
       detectRespawnSupervisor({ LAUNCH_JOB_LABEL: "ai.openclaw.gateway" }, "freebsd"),
     ).toBeNull();
+  });
+
+  it("detects ohos supervisor on openharmony platform from service name hint", () => {
+    expect(
+      detectRespawnSupervisor({ OPENCLAW_OHOS_SERVICE_NAME: "OpenClaw Gateway" }, "openharmony"),
+    ).toBe("ohos");
+    expect(detectRespawnSupervisor({ OPENCLAW_OHOS_SERVICE_NAME: "   " }, "openharmony")).toBeNull();
+    expect(detectRespawnSupervisor({}, "openharmony")).toBeNull();
   });
 });

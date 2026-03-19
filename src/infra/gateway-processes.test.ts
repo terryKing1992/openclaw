@@ -73,6 +73,16 @@ describe("gateway-processes", () => {
     expect(parseProcCmdlineMock).toHaveBeenCalledWith("node\0dist/index.js\0gateway\0run\0");
   });
 
+  it("reads openharmony process args from /proc (same as linux)", () => {
+    setPlatform("openharmony");
+    readFileSyncMock.mockReturnValue("node\0dist/index.js\0gateway\0run\0");
+    parseProcCmdlineMock.mockReturnValue(["node", "dist/index.js", "gateway", "run"]);
+
+    expect(readGatewayProcessArgsSync(4242)).toEqual(["node", "dist/index.js", "gateway", "run"]);
+    expect(readFileSyncMock).toHaveBeenCalledWith("/proc/4242/cmdline", "utf8");
+    expect(parseProcCmdlineMock).toHaveBeenCalledWith("node\0dist/index.js\0gateway\0run\0");
+  });
+
   it("reads darwin process args from ps output and returns null on ps failure", () => {
     setPlatform("darwin");
     spawnSyncMock

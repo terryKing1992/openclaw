@@ -8,6 +8,15 @@ import {
   uninstallLaunchAgent,
 } from "./launchd.js";
 import {
+  installOhosService,
+  isOhosServiceLoaded,
+  readOhosServiceCommand,
+  readOhosServiceRuntime,
+  restartOhosService,
+  stopOhosService,
+  uninstallOhosService,
+} from "./ohos-service.js";
+import {
   installScheduledTask,
   isScheduledTaskInstalled,
   readScheduledTaskCommand,
@@ -91,7 +100,7 @@ export function describeGatewayServiceRestart(
   };
 }
 
-type SupportedGatewayServicePlatform = "darwin" | "linux" | "win32";
+type SupportedGatewayServicePlatform = "darwin" | "linux" | "win32" | "openharmony";
 
 const GATEWAY_SERVICE_REGISTRY: Record<SupportedGatewayServicePlatform, GatewayService> = {
   darwin: {
@@ -129,6 +138,18 @@ const GATEWAY_SERVICE_REGISTRY: Record<SupportedGatewayServicePlatform, GatewayS
     isLoaded: isScheduledTaskInstalled,
     readCommand: readScheduledTaskCommand,
     readRuntime: readScheduledTaskRuntime,
+  },
+  openharmony: {
+    label: "OpenHarmony Service",
+    loadedText: "running",
+    notLoadedText: "stopped",
+    install: ignoreInstallResult(installOhosService),
+    uninstall: uninstallOhosService,
+    stop: stopOhosService,
+    restart: restartOhosService,
+    isLoaded: isOhosServiceLoaded,
+    readCommand: readOhosServiceCommand,
+    readRuntime: readOhosServiceRuntime,
   },
 };
 
